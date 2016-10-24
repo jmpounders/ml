@@ -7,6 +7,7 @@ class LinearRegression:
     """A basic implementation of linear regression."""
     def __init__(self):
         self.theta_trained = None
+        self.num_iters = None
 
     def predict(self,X,theta=None):
         """Predict output based on observations X and linear weights theta."""
@@ -39,11 +40,11 @@ class LinearRegression:
     def train(self,X,y,lmbda=0.0,tol=0.0001,max_iters=500):
         """Train on data X with target y."""
         def grad_func(theta): return self.cost_grad(X,theta,y,lmbda)
-        self.theta_trained,iter = opt.gradient_descent(grad_func,
-                                                       0.1,
-                                                       np.zeros(X.shape[1]),
-                                                       max_iters,
-                                                       tol)
+        self.theta_trained,self.num_iters = opt.gradient_descent(grad_func,
+                                                                 0.1,
+                                                                 np.zeros(X.shape[1]),
+                                                                 max_iters,
+                                                                 tol)
         return self.theta_trained
 
     def solve_normal_eqns(self,X,y,lmbda=0.0):
