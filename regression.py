@@ -8,6 +8,8 @@ class LinearRegression:
     def __init__(self):
         self.theta_trained = None
         self.num_iters = None
+        self.vtheta_err = None
+        self.vcost = None
 
     def predict(self,X,theta=None):
         """Predict output based on observations X and linear weights theta."""
@@ -20,7 +22,7 @@ class LinearRegression:
     def cost(self,X,theta,y,lmbda=0.0):
         """Calculate the cost/objective function given observations X, linear weights theta, and target y."""
         m = X.shape[0]
-        return (np.dot(X,theta) - y)**2/(2.0*m) + self.reg_func(theta,lmbda/m)
+        return np.sum(np.dot(X,theta) - y)**2/(2.0*m) + self.reg_func(theta,lmbda/m)
 
     def cost_grad(self,X,theta,y,lmbda=0.0):
         """Calculate the gradient of the cost/objective function at theta."""
@@ -37,14 +39,25 @@ class LinearRegression:
         grad[0] = 0.0
         return coeff*grad
 
-    def train(self,X,y,lmbda=0.0,tol=0.0001,max_iters=500):
+    def train(self,X,y,lmbda=0.0,tol=0.0001,max_iters=500,verbose=False):
         """Train on data X with target y."""
         def grad_func(theta): return self.cost_grad(X,theta,y,lmbda)
-        self.theta_trained,self.num_iters = opt.gradient_descent(grad_func,
-                                                                 0.1,
-                                                                 np.zeros(X.shape[1]),
-                                                                 max_iters,
-                                                                 tol)
+        if not verbose:
+            self.theta_trained,self.num_iters = opt.gradient_descent(grad_func,
+                                                                     0.1,
+                                                                     np.zeros(X.shape[1]),
+                                                                     max_iters,
+                                                                     tol)
+        else:
+            def cost_func(theta): return self.cost(X,theta,y,lmbda)
+            self.theta_trained,self.num_iters,self.vtheta_err,self.vcost = opt.gradient_descent_verbose(
+                grad_func,
+                0.1,
+                np.zeros(X.shape[1]),
+                max_iters,
+                tol,
+                cost_func)
+            
         return self.theta_trained
 
     def solve_normal_eqns(self,X,y,lmbda=0.0):
