@@ -4,10 +4,10 @@ This repository contains code for common machine learning algorithms.  I am writ
 
 Currently under development:
 - Linear regression
+- Logistic regression
 
 Planned:
 - Support vector machines
-- Logistic regression
 - Artificial neural networks
 - Others...
 
