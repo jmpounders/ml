@@ -1,6 +1,8 @@
 import numpy as np
 import warnings
 
+warnings.simplefilter('always', UserWarning)
+
 def gradient_descent(grad_func, alpha, theta, max_iters=500, tol=0.001):
     for iter in range(max_iters):
         theta_old = theta
