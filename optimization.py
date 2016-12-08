@@ -8,7 +8,7 @@ def gradient_descent(grad_func, alpha, theta, max_iters=500, tol=0.001):
         theta_old = theta
         theta = theta - alpha*grad_func(theta)
         err = np.abs(theta_old - theta)
-        if np.max(err/theta) < tol: break
+        if np.max(err) < tol: break
 
     if iter==max_iters-1:
         warnings.warn('Gradient descent did not converge.')
