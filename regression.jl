@@ -7,9 +7,15 @@ type LinearRegression <: Model
     theta::Array{Float64,1}
     lmbda::Float64
     alpha::Float64
+    penalty_norm::Int
 end
 
+LinearRegression(theta,lmbda,alpha) = LinearRegression(theta,lmbda,alpha,0)
+LassoRegression(theta,lmbda,alpha) = LinearRegression(theta,lmbda,alpha,1)
+RidgeRegression(theta,lmbda,alpha) = LinearRegression(theta,lmbda,alpha,2)
 
+# Cost Functions
+# --------------
 """
     cost(model, X, y)
 
@@ -39,6 +45,8 @@ end
 cost_grad(model::LinearRegression) = cost_grad_lr
 
 
+# Penalty/Regularization Functions
+# --------------------------------
 """
     penalty(theta, coeff, p=2)
 
@@ -60,6 +68,8 @@ function penalty_grad(theta, coeff, p=2)
 end
 
 
+# Training and predicting functions
+# ---------------------------------
 """
     train!(model, X, y)
 
