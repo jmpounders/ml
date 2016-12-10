@@ -15,8 +15,7 @@ function gradient_descent(grad_func, alpha, theta::Array{Float64,1}, max_iters=1
     end
 
     if !converged
-        println("Gradient descent did not converge.")
-        return theta*0
+        warn("Gradient descent did not converge.")
     end
     theta
 end
