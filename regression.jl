@@ -1,3 +1,8 @@
+module Regression
+
+export LinearRegression, LassoRegression, RidgeRegression
+export train!, predict, solve_normal_equations!
+
 using Optimization
 
 abstract Model
@@ -65,6 +70,7 @@ Compute the gradient of the penalty term.
 function penalty_grad(theta, coeff, p=2)
     grad = coeff*p*theta.*abs(theta).^(p-2)
     grad[1] = 0.0
+    return grad
 end
 
 
@@ -75,7 +81,7 @@ end
 
 Train model using feature matrix X and labels y.
 """
-function train!(model::Model, X, y)
+function train!(model::LinearRegression, X, y)
     cost_grad_model = cost_grad(model)
     grad(theta) = cost_grad_model(theta, model.lmbda, X, y)
     model.theta = gradient_descent(grad, model.alpha, model.theta)
@@ -87,7 +93,7 @@ end
 
 Make a prediction on feature matrix X given model.
 """
-function predict(model, X)
+function predict(model::LinearRegression, X)
     X*model.theta
 end
 
@@ -98,8 +104,10 @@ end
 Solve the normal equations for regularized linear regression and
 return the parameter vector in model.
 """
-function solve_normal_equations!(model, X, y)
+function solve_normal_equations!(model::LinearRegression, X, y)
     L = eye(length(model.theta))
     L[1,1] = 0.0
     model.theta = (X'*X + model.lmbda*L)\(X'*y)
+end
+
 end
