@@ -4,6 +4,7 @@ export LinearRegression, LassoRegression, RidgeRegression
 export train!, predict, solve_normal_equations!
 
 using Optimization
+using Regularization
 
 abstract Model
 
@@ -22,17 +23,17 @@ RidgeRegression(theta,lmbda,alpha) = LinearRegression(theta,lmbda,alpha,2)
 # Cost Functions
 # --------------
 """
-    cost(model, X, y)
+    cost_lr(model, lmbda, X, y)
 
 Compute the cost function associated with a linear regression model.
 
 Note: the cost function is not used directly in training.  It is provided
 for information/validation only.
 """
-function cost(model::LinearRegression, X, y)
+function cost_lr(theta, lmbda, X, y)
     m = size(X)[1]
-    err = X*model.theta - y
-    dot(err,err)/(2*m) + penalty(model.theta,model.lmbda)
+    err = X*theta - y
+    dot(err,err)/(2*m) + penalty(theta,lmbda)
 end
 
 
@@ -47,31 +48,8 @@ function cost_grad_lr(theta, lmbda, X, y)
     (X'*err)/m + penalty_grad(theta,lmbda)
 end
 
+cost(model::LinearRegression) = cost_lr
 cost_grad(model::LinearRegression) = cost_grad_lr
-
-
-# Penalty/Regularization Functions
-# --------------------------------
-"""
-    penalty(theta, coeff, p=2)
-
-Compute the regularization penalty.  Currently this is an Lp penaly excluding the bias term.
-"""
-function penalty(theta, coeff, p=2)
-    coeff*(norm(theta,p)^p - abs(theta[1])^p)
-end
-
-
-"""
-    penalty_grad(theta, coeff)
-
-Compute the gradient of the penalty term.
-"""
-function penalty_grad(theta, coeff, p=2)
-    grad = coeff*p*theta.*abs(theta).^(p-2)
-    grad[1] = 0.0
-    return grad
-end
 
 
 # Training and predicting functions
@@ -81,10 +59,20 @@ end
 
 Train model using feature matrix X and labels y.
 """
-function train!(model::LinearRegression, X, y)
+function train!(model::LinearRegression, X, y; params...)
+
+    cost_model = cost(model)
     cost_grad_model = cost_grad(model)
+
+    objective(theta) = cost_model(theta, model.lmbda, X, y)
     grad(theta) = cost_grad_model(theta, model.lmbda, X, y)
-    model.theta = gradient_descent(grad, model.alpha, model.theta)
+
+    params = Dict{Any,Any}(params)
+    if !(:objective in keys(params))
+        params[:objective] = objective
+    end
+    
+    model.theta = gradient_descent(grad, model.alpha, model.theta; params...)
 end
 
 

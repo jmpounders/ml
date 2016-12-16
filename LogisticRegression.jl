@@ -4,6 +4,7 @@ export LogitRegression
 export train!, predict
 
 using Optimization
+using Regularization
 
 abstract Model
 
@@ -22,14 +23,14 @@ sigmoid(z) = 1.0./(1.0 + exp(-z))
 # Cost Functions
 # --------------
 """
-    cost_logit(theta, X, y)
+    cost_logit(theta, lmbda, X, y)
 
 Compute the cost function associated with logistic regression.
 """
-function cost_logit(theta, X, y)
+function cost_logit(theta, lmbda, X, y)
     m = size(X)[1]
     h = sigmoid(X*theta)
-    (-y'*log(h) - (1-y)'*log(1-h))/m
+    (-y'*log(h) - (1-y)'*log(1-h))/m + penalty(theta,lmbda)
 end
 
 
@@ -45,21 +46,11 @@ function cost_grad_logit(theta, lmbda, X, y)
     (X'*err)/m + penalty_grad(theta,lmbda)
 end
 
-
-"""
-    penalty_grad(theta, coeff, p=2)
-
-Compute the gradient of the penalty term.
-"""
-function penalty_grad(theta, coeff, p=2)
-    grad = coeff*p*theta.*abs(theta).^(p-2)
-    grad[1] = 0.0
-    return grad
-end
-
 cost(model::LogitRegression) = cost_logit
 cost_grad(model::LogitRegression) = cost_grad_logit
 
+# Training and predicting functions
+# ---------------------------------
 """
     train!(model, X, y)
 
@@ -75,7 +66,7 @@ function train!(model::LogitRegression, X, y; params...)
     cost_model = cost(model)
     cost_grad_model = cost_grad(model)
     
-    objective(theta) = cost_model(theta, X, y)
+    objective(theta) = cost_model(theta, model.lmbda, X, y)
     grad(theta) = cost_grad_model(theta, model.lmbda, X, y)
 
     params = Dict{Any,Any}(params)

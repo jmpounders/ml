@@ -1,21 +1,22 @@
 module Optimization
 
-export gradient_descent, gradient_descent_verbose
+export gradient_descent
 
 """
     gradient_descent(grad_func, alpha, theta::Array{Float64,1};
-                     max_iters=1000, tol=1.0e-4,
+                     max_iters::Int=1000, tol::Float=1.0e-4,
                      callback=nothing, objective=nothing)
 
 Return the parameter vector obtained by applying gradient descent with the grad_func
 gradient function.
 
-The other parameters are defined as follows:
-    alpha is the learning rate
-    theta is the initial guess
-    max_iters is the maximum number of iterations to perform
-    tol is the stopping tolerance
-    callback is an optional function to call following every iteration
+# Arguments
+* `alpha`: the learning rate
+* `theta::Array{Float64,1}`: the initial guess
+* `max_iters::Int=1000`: the maximum number of iterations to perform
+* `tol::Float=1.0e-4`: the stopping tolerance
+* `callback`: an optional function to call following every iteration
+* `objective`: an optional objective function
 """
 function gradient_descent(grad_func, alpha, theta::Array{Float64,1};
                           max_iters=1000, tol=1.0e-4,
