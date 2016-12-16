@@ -64,20 +64,26 @@ cost_grad(model::LogitRegression) = cost_grad_logit
     train!(model, X, y)
 
 Train model using feature matrix X and labels y.
+
+The params argument provides the parameter input to the
+optimization routine.  The objective function is added
+to these parameters, but it is only called if a callback
+function is also provided.
 """
-function train!(model::LogitRegression, X, y, verbose=false)
+function train!(model::LogitRegression, X, y; params...)
+
     cost_model = cost(model)
     cost_grad_model = cost_grad(model)
     
     objective(theta) = cost_model(theta, X, y)
     grad(theta) = cost_grad_model(theta, model.lmbda, X, y)
-    if !verbose
-        model.theta = gradient_descent(grad, model.alpha, model.theta)
-    else
-        params = (:callback => println,
-                  :objective => objective)
-        model.theta = gradient_descent(grad, model.alpha, model.theta; params...)
+
+    params = Dict{Any,Any}(params)
+    if !(:objective in keys(params))
+        params[:objective] = objective
     end
+    
+    model.theta = gradient_descent(grad, model.alpha, model.theta; params...)
 end
 
 """
