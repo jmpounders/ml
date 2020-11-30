@@ -1,4 +1,4 @@
-# Learning Machine Learning
+# Machine Learning
 
 This repository contains code for common machine learning algorithms.  I am writing these algorithms from scratch to get a better understanding of how they "really" work.
 
